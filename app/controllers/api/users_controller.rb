@@ -1,5 +1,6 @@
 class Api::UsersController < Api::BaseController
-    before_action :authenticate_user!
+    before_action :authenticate_user!, :find_user
+    before_action :find_user, only: [:show]
     
     def index
         @users = User.all
@@ -7,8 +8,6 @@ class Api::UsersController < Api::BaseController
             users: @users
         }
         render json: data.to_json()
-        # render jsonapi: @users
-        # render_jsonapi_response(@users)
     end
 
     def show
@@ -19,11 +18,11 @@ class Api::UsersController < Api::BaseController
         render json: @data.to_json()
     end
   
-    # private
+    private
   
-    # def find_user
-    #   @user = User.find(params[:id])
-    # end
+    def find_user
+      @user = User.find(params[:id])
+    end
   
 end
   
