@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     resources :users, only: %w[index show]
+    resources :bills do
+      resources :bill_items
+      resources :bill_recipients
+    end
+
   end
 
   devise_for :users,
