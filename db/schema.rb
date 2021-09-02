@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_02_163115) do
+ActiveRecord::Schema.define(version: 2021_09_02_200232) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,12 +41,12 @@ ActiveRecord::Schema.define(version: 2021_09_02_163115) do
   end
 
   create_table "bills", force: :cascade do |t|
-    t.datetime "event_date"
-    t.integer "total_amount"
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "bill_name"
+    t.boolean "isFulfilled", default: false
+    t.integer "total_amount", default: 0
     t.index ["user_id"], name: "index_bills_on_user_id"
   end
 
