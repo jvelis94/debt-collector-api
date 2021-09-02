@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  event_date: 2021-09-02 12:19:02
+  total_amount: 1
+  user: one
+
+two:
+  event_date: 2021-09-02 12:19:02
+  total_amount: 1
+  user: two
