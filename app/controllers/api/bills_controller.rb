@@ -18,13 +18,13 @@ class Api::BillsController < ApplicationController
     end
 
     def show
-        render json: @bill.to_json()
+        render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
     private
 
     def set_bill
-        @bill = Bill.find(params[:id])
+        @bill = Bill.includes(:bill_recipients).find(params[:id])
     end
 
     def bill_params

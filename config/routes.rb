@@ -2,7 +2,12 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json } do
     resources :users, only: %w[index show]
     resources :bills do
-      resources :bill_items
+      resources :bill_items do 
+        member do
+          patch :increment_quantity
+          patch :decrement_quantity
+        end
+      end
       resources :bill_recipients
     end
 

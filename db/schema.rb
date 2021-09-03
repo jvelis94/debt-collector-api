@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_02_200232) do
+ActiveRecord::Schema.define(version: 2021_09_03_164546) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -19,10 +19,10 @@ ActiveRecord::Schema.define(version: 2021_09_02_200232) do
     t.bigint "bill_id", null: false
     t.bigint "bill_recipient_id", null: false
     t.string "item_name"
-    t.integer "quantity"
     t.integer "price"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "quantity", default: 1
     t.index ["bill_id"], name: "index_bill_items_on_bill_id"
     t.index ["bill_recipient_id"], name: "index_bill_items_on_bill_recipient_id"
   end
@@ -30,13 +30,13 @@ ActiveRecord::Schema.define(version: 2021_09_02_200232) do
   create_table "bill_recipients", force: :cascade do |t|
     t.bigint "bill_id", null: false
     t.string "recipient_name"
-    t.integer "total_owes"
-    t.integer "total_paid"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "tax"
-    t.integer "subtotal"
-    t.integer "gratuity"
+    t.integer "total_owes", default: 0
+    t.integer "total_paid", default: 0
+    t.integer "tax", default: 0
+    t.integer "subtotal", default: 0
+    t.integer "gratuity", default: 0
     t.index ["bill_id"], name: "index_bill_recipients_on_bill_id"
   end
 
