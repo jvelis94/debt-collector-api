@@ -9,7 +9,8 @@ class Api::BillItemsController < ApplicationController
         if @bill_item.save
             update_bill_values("increment")
             update_bill_recipient_subtotal("increment")
-            render json: @bill_item.to_json()
+            render json: @bill_item.to_json({ include: :bill_recipient })
+            # render json: @bill_item.to_json()
         else
             render json: { 
                 message: "could not add bill item, please try again"
@@ -22,12 +23,14 @@ class Api::BillItemsController < ApplicationController
         @bill_item.increment!(:quantity)
         update_bill_values("increment")
         update_bill_recipient_subtotal("increment")
+        render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     def decrement_quantity
         @bill_item.decrement!(:quantity)
         update_bill_values("decrement")
         update_bill_recipient_subtotal("decrement")
+        render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     def destroy
