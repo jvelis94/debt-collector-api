@@ -1,6 +1,6 @@
 class Api::BillsController < ApplicationController
     before_action :authenticate_user!
-    before_action :set_bill, only: [:show]
+    before_action :set_bill, only: [:show, :update]
 
     respond_to :html, :json
 
@@ -21,6 +21,18 @@ class Api::BillsController < ApplicationController
         render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
+    def update
+        puts 'updating bill and recipients'
+        if params[:tax]
+            @bill.update_attribute(:tax, params[:tax])
+        elsif params[:gratuity]
+            @bill.update_attribute(:gratuity, params[:gratuity])
+        else
+            @bill.update(bill_params)
+        end
+        render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
+    end
+
     private
 
     def set_bill
@@ -30,5 +42,10 @@ class Api::BillsController < ApplicationController
     def bill_params
         params.require(:bill).permit(:bill_name)
     end
+
+    # def update_tax(tax_param)
+
+
+    # end
 
 end
