@@ -26,11 +26,27 @@ class Api::BillsController < ApplicationController
         if params[:tax]
             @bill.update_attribute(:tax, params[:tax])
         elsif params[:gratuity]
-            @bill.update_attribute(:gratuity, params[:gratuity])
+            @bill.update!(gratuity: params[:gratuity])
+            update_bill_on_gratuity
+            update_recipient_on_gratuity
         else
             @bill.update(bill_params)
         end
         render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
+    end
+
+    def update_bill_on_gratuity
+        new_gratuity = @bill.gratuity * @bill.subtotal
+        bill_total = @bill.subtotal + @bill.tax + new_gratuity
+        @bill.update!(total_amount: bill_total, gratuity_amount: new_gratuity)
+    end
+
+    def update_recipient_on_gratuity
+        @bill.bill_recipients.each do |recipient|
+            new_recipient_gratuity = @bill.gratuity * recipient.subtotal
+            new_recipient_owes = recipient.subtotal + recipient.tax + new_recipient_gratuity
+            recipient.update!(gratuity: new_recipient_gratuity, total_owes: new_recipient_owes)
+        end
     end
 
     private

@@ -41,6 +41,7 @@ class Api::BillItemsController < ApplicationController
         else
             update_bill_and_recipient_values(@bill_item)
         end
+        render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     private
