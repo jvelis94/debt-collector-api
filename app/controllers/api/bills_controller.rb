@@ -24,7 +24,9 @@ class Api::BillsController < ApplicationController
     def update
         puts 'updating bill and recipients'
         if params[:tax]
-            @bill.update_attribute(:tax, params[:tax])
+            @bill.update!(tax: params[:tax])
+            update_bill_on_gratuity
+            update_recipient_on_gratuity
         elsif params[:gratuity]
             @bill.update!(gratuity: params[:gratuity])
             update_bill_on_gratuity
@@ -43,9 +45,11 @@ class Api::BillsController < ApplicationController
 
     def update_recipient_on_gratuity
         @bill.bill_recipients.each do |recipient|
+            recipient_share_of_tax = recipient.subtotal / @bill.subtotal
+            recipient_tax = @bill.tax * recipient_share_of_tax
             new_recipient_gratuity = @bill.gratuity * recipient.subtotal
-            new_recipient_owes = recipient.subtotal + recipient.tax + new_recipient_gratuity
-            recipient.update!(gratuity: new_recipient_gratuity, total_owes: new_recipient_owes)
+            new_recipient_owes = recipient.subtotal + recipient_tax + new_recipient_gratuity
+            recipient.update!(gratuity: new_recipient_gratuity, tax: recipient_tax, total_owes: new_recipient_owes)
         end
     end
 
