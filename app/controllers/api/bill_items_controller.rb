@@ -6,38 +6,37 @@ class Api::BillItemsController < ApplicationController
 
     def create
         @bill_item = BillItem.new(bill_item_params)
+        @bill_item = update_bill_item_total(@bill_item)
         if @bill_item.save
-            # update_bill_values("increment")
-            # update_bill_recipient_subtotal("increment")
             update_bill_and_recipient_values("increment")
             render json: @bill_item.to_json({ include: :bill_recipient })
-            # render json: @bill_item.to_json()
         else
             render json: { 
                 message: "could not add bill item, please try again"
             }.to_json() 
-            print @bill_item.errors.full_messages
+            print !bill_item.errors.full_messages
         end
     end
 
     def increment_quantity
         @bill_item.increment!(:quantity)
+        @bill_item = update_bill_item_total(@bill_item)
+        @bill_item.save
         update_bill_and_recipient_values("increment")
-        # update_bill_values("increment")
-        # update_bill_recipient_subtotal("increment")
         render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     def decrement_quantity
         @bill_item.decrement!(:quantity)
+        @bill_item = update_bill_item_total(@bill_item)
+        @bill_item.save
         update_bill_and_recipient_values("decrement")
-        # update_bill_values("decrement")
-        # update_bill_recipient_subtotal("decrement")
         render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     def destroy
         @bill_item.destroy
+        update_bill_and_recipient_values("destroy")
     end
 
     private
@@ -58,6 +57,11 @@ class Api::BillItemsController < ApplicationController
     def update_bill_and_recipient_values(type)
         update_bill_values(type)
         update_bill_recipient_values(type)
+    end
+
+    def update_bill_item_total(bill_item)
+        bill_item.total = bill_item.price * bill_item.quantity
+        return bill_item
     end
 
     def bill_item_params
