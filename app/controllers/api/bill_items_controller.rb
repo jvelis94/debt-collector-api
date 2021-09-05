@@ -8,7 +8,7 @@ class Api::BillItemsController < ApplicationController
         @bill_item = BillItem.new(bill_item_params)
         @bill_item = update_bill_item_total(@bill_item)
         if @bill_item.save
-            update_bill_and_recipient_values("increment")
+            update_bill_and_recipient_values(@bill_item)
             render json: @bill_item.to_json({ include: :bill_recipient })
         else
             render json: { 
@@ -22,7 +22,7 @@ class Api::BillItemsController < ApplicationController
         @bill_item.increment!(:quantity)
         @bill_item = update_bill_item_total(@bill_item)
         @bill_item.save
-        update_bill_and_recipient_values("increment")
+        update_bill_and_recipient_values(@bill_item)
         render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
@@ -30,33 +30,36 @@ class Api::BillItemsController < ApplicationController
         @bill_item.decrement!(:quantity)
         @bill_item = update_bill_item_total(@bill_item)
         @bill_item.save
-        update_bill_and_recipient_values("decrement")
+        update_bill_and_recipient_values(@bill_item)
         render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     def destroy
+        @bill = Bill.find(@bill_item.bill_id)
         @bill_item.destroy
-        update_bill_and_recipient_values("destroy")
+        if @bill.bill_items.count === 0
+            @bill.update!(total_amount: 0, subtotal: 0)
+            @bill.bill_recipients.each { |bill_recipient| bill_recipient.update!(total_owes: 0, subtotal: 0) }
+        end
     end
 
     private
 
-    def update_bill_values(type)
-        subtotal_action = type === "increment" ? @bill_item.bill.total_amount + @bill_item.price : @bill_item.bill.total_amount - @bill_item.price
-        total_action = type === "increment" ? @bill_item.bill.subtotal + @bill_item.price : @bill_item.bill.subtotal - @bill_item.price
-        @bill_item.bill.update!(total_amount: total_action, subtotal: subtotal_action)
+    def update_bill_values(bill_item)
+        bill = Bill.find(bill_item.bill_id)
+        bill_total = bill.bill_recipients.pluck(:subtotal).inject(:+)
+        bill_item.bill.update!(subtotal: bill_total)
               
     end
 
-    def update_bill_recipient_values(type)
-        subtotal_action = type === "increment" ? @bill_item.bill_recipient.subtotal + @bill_item.price : @bill_item.bill_recipient.subtotal - @bill_item.price
-        total_action = type === "increment" ? @bill_item.bill_recipient.total_owes + @bill_item.price : @bill_item.bill_recipient.total_owes - @bill_item.price
-        @bill_item.bill_recipient.update!(subtotal: subtotal_action, total_owes: total_action)
+    def update_bill_recipient_values(bill_item)
+        bill_recipient_subtotal = bill_item.bill_recipient.bill_items.pluck(:total).inject(:+)
+        bill_item.bill_recipient.update!(subtotal: bill_recipient_subtotal)
     end
 
-    def update_bill_and_recipient_values(type)
-        update_bill_values(type)
-        update_bill_recipient_values(type)
+    def update_bill_and_recipient_values(bill_item)
+        update_bill_recipient_values(bill_item)
+        update_bill_values(bill_item)
     end
 
     def update_bill_item_total(bill_item)
