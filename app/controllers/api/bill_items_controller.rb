@@ -1,8 +1,6 @@
 class Api::BillItemsController < ApplicationController
     before_action :authenticate_user!
     before_action :set_bill_item, only: [:show, :increment_quantity, :decrement_quantity, :destroy]
-    # after_action :update_bill_values
-    
 
     def create
         @bill_item = BillItem.new(bill_item_params)
