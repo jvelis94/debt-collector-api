@@ -36,8 +36,10 @@ class Api::BillItemsController < ApplicationController
         @bill = Bill.find(@bill_item.bill_id)
         @bill_item.destroy
         if @bill.bill_items.count === 0
-            @bill.update!(total_amount: 0, subtotal: 0)
-            @bill.bill_recipients.each { |bill_recipient| bill_recipient.update!(total_owes: 0, subtotal: 0) }
+            @bill.update!(total_amount: 0, subtotal: 0, gratuity_amount: 0)
+            @bill.bill_recipients.each { |bill_recipient| bill_recipient.update!(total_owes: 0, subtotal: 0, gratuity: 0) }
+        else
+            update_bill_and_recipient_values(@bill_item)
         end
     end
 
