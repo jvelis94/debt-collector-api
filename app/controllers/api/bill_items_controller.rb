@@ -45,14 +45,17 @@ class Api::BillItemsController < ApplicationController
 
     def update_bill_values(bill_item)
         bill = Bill.find(bill_item.bill_id)
-        bill_total = bill.bill_recipients.pluck(:subtotal).inject(:+)
-        bill_item.bill.update!(subtotal: bill_total)
-              
+        bill_subtotal = bill.bill_recipients.pluck(:subtotal).inject(:+)
+        bill_gratuity = bill_subtotal * bill.gratuity
+        bill_total = bill_subtotal + bill_gratuity
+        bill_item.bill.update!(subtotal: bill_subtotal, gratuity_amount: bill_gratuity, total_amount: bill_total)
     end
 
     def update_bill_recipient_values(bill_item)
         bill_recipient_subtotal = bill_item.bill_recipient.bill_items.pluck(:total).inject(:+)
-        bill_item.bill_recipient.update!(subtotal: bill_recipient_subtotal)
+        bill_recipient_gratuity = bill_recipient_subtotal * bill_item.bill.gratuity
+        bill_recipient_total = (bill_recipient_subtotal + bill_recipient_gratuity)
+        bill_item.bill_recipient.update!(subtotal: bill_recipient_subtotal, gratuity: bill_recipient_gratuity, total_owes: bill_recipient_total)
     end
 
     def update_bill_and_recipient_values(bill_item)
