@@ -3,7 +3,13 @@ class Api::BillsController < ApplicationController
     before_action :set_bill, only: [:show, :update]
 
     respond_to :html, :json
+    
+    def index
+        @bills = Bill.where(user: current_user)
+        render json: @bills.to_json()
+    end
 
+    
     def create
         @bill = Bill.new(bill_params)
         @bill.user = current_user
@@ -18,7 +24,11 @@ class Api::BillsController < ApplicationController
     end
 
     def show
-        render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
+        if @bill.user === current_user
+            render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
+        else
+            render json: { message: "unauthorized"}.to_json()
+        end
     end
 
     def update
