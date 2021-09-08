@@ -1,19 +1,19 @@
 class Api::BillItemsController < ApplicationController
     before_action :authenticate_user!
     before_action :set_bill_item, only: [:show, :increment_quantity, :decrement_quantity, :destroy]
-    before_action :set_bill, only: [:show, :increment_quantity, :decrement_quantity, :destroy]
-    before_action :set_bill_recipient, only: [:show, :increment_quantity, :decrement_quantity, :destroy]
+    before_action :set_bill
+    before_action :set_bill_recipient
 
     def create
+        puts "IN BILL ITEMS CREATE AGAIN"
+        puts @bill_recipient.id
         @bill_item = BillItem.new(bill_item_params)
-        @bill_item = update_bill_item_total(@bill_item)
         if @bill_item.save
-            update_bill_and_recipient_values(@bill_item)
-            render json: @bill_item.to_json({ include: :bill_recipient })
+            UpdateBillItemTotal.new(@bill_item).call
+            bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
+            render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
         else
-            render json: { 
-                message: "could not add bill item, please try again"
-            }.to_json() 
+            render json: { message: "could not add bill item, please try again" }.to_json() 
             print !bill_item.errors.full_messages
         end
     end
@@ -21,15 +21,17 @@ class Api::BillItemsController < ApplicationController
     def increment_quantity
         @bill_item.increment!(:quantity)
         UpdateBillItemTotal.new(@bill_item).call
-        UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
-        render json: @bill_item.to_json({ include: :bill_recipient })
+        
+        bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
+        render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
     def decrement_quantity
         @bill_item.decrement!(:quantity)
         UpdateBillItemTotal.new(@bill_item).call
-        UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
-        render json: @bill_item.to_json({ include: :bill_recipient })
+        
+        bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
+        render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
     def destroy
@@ -37,10 +39,12 @@ class Api::BillItemsController < ApplicationController
         if @bill.bill_items.count === 0
             @bill.update!(total_amount: 0, subtotal: 0, gratuity_amount: 0)
             @bill.bill_recipients.each { |bill_recipient| bill_recipient.update!(total_owes: 0, subtotal: 0, gratuity: 0) }
+            render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
         else
-            UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
+            bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
+            render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
         end
-        render json: @bill_item.to_json({ include: :bill_recipient })
+        # render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     private
@@ -59,7 +63,7 @@ class Api::BillItemsController < ApplicationController
     end
 
     def set_bill_recipient
-        @bill_recipient = BillRecipient.find_by(bill_id: params[:bill_id])
+        @bill_recipient = BillRecipient.find(params[:bill_recipient_id])
     end
 
 end
