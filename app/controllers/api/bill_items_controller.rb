@@ -44,7 +44,6 @@ class Api::BillItemsController < ApplicationController
             bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
             render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
         end
-        # render json: @bill_item.to_json({ include: :bill_recipient })
     end
 
     private

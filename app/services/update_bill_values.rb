@@ -4,10 +4,6 @@ class UpdateBillValues
     end
 
     def call
-        puts "IN UPDATE BILL VALUES"
-        puts bill_subtotal
-        puts bill_gratuity
-        puts bill_total
         @bill.update!(subtotal: bill_subtotal, gratuity_amount: bill_gratuity, total_amount: bill_total)
         return @bill
     end
