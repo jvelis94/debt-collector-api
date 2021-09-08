@@ -6,11 +6,10 @@ class Api::BillRecipientsController < ApplicationController
         bill = Bill.find(params[:bill_id])
         @bill_recipient.bill = bill
         if @bill_recipient.save
-            render json: @bill_recipient.to_json()
+            render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
+            # render json: @bill_recipient.to_json()
         else
-            render json: { 
-                message: "could not add bill recipient, please try again"
-            }.to_json() 
+            render json: { message: "could not add bill recipient, please try again" }.to_json() 
             print @bill_recipient.errors.full_messages
         end
     end
