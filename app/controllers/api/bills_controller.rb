@@ -3,10 +3,10 @@ class Api::BillsController < ApplicationController
     before_action :set_bill, only: [:show, :update]
 
     respond_to :html, :json
-    
+
     def index
         @bills = Bill.where(user: current_user)
-        render json: @bills.to_json()
+        render json: @bills.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
     
