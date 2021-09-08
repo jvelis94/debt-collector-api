@@ -5,8 +5,6 @@ class Api::BillItemsController < ApplicationController
     before_action :set_bill_recipient
 
     def create
-        puts "IN BILL ITEMS CREATE AGAIN"
-        puts @bill_recipient.id
         @bill_item = BillItem.new(bill_item_params)
         if @bill_item.save
             UpdateBillItemTotal.new(@bill_item).call
@@ -19,31 +17,19 @@ class Api::BillItemsController < ApplicationController
     end
 
     def increment_quantity
-        @bill_item.increment!(:quantity)
-        UpdateBillItemTotal.new(@bill_item).call
-        
-        bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
-        render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
+        updated_bill = IncrementBillItem.new(@bill, @bill_recipient, @bill_item).call
+        render json: updated_bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
     def decrement_quantity
-        @bill_item.decrement!(:quantity)
-        UpdateBillItemTotal.new(@bill_item).call
-        
-        bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
-        render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
+        updated_bill = DecrementBillItem.new(@bill, @bill_recipient, @bill_item).call
+        render json: updated_bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
     def destroy
         @bill_item.destroy
-        if @bill.bill_items.count === 0
-            @bill.update!(total_amount: 0, subtotal: 0, gratuity_amount: 0)
-            @bill.bill_recipients.each { |bill_recipient| bill_recipient.update!(total_owes: 0, subtotal: 0, gratuity: 0) }
-            render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
-        else
-            bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
-            render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
-        end
+        updated_bill = UpdateBillAndRecipientValues.new(@bill, @bill_recipient).call
+        render json: updated_bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
     private

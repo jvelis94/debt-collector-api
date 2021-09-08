@@ -10,7 +10,7 @@ class UpdateBillRecipientValues
     private
 
     def bill_recipient_subtotal
-        @bill_recipient.bill_items.pluck(:total).inject(:+)
+        @bill_recipient.bill_items.pluck(:total).inject(:+) || 0
     end
 
     def bill_recipient_gratuity
