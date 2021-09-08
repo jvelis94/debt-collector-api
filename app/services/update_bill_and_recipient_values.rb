@@ -5,7 +5,7 @@ class UpdateBillAndRecipientValues
     end
 
     def call
-        UpdateBillRecipientValues.new(@bill_recipient).call
+        @bill.bill_recipients.each { |bill_recipient| UpdateBillRecipientValues.new(bill_recipient).call }
         bill = UpdateBillValues.new(@bill).call
         return bill
     end

@@ -19,7 +19,8 @@ class UpdateBillValues
     end
 
     def bill_total
-        bill_subtotal + bill_gratuity
+        bill_subtotal + bill_gratuity + @bill.tax
     end
+
 
 end

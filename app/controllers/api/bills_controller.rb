@@ -16,9 +16,7 @@ class Api::BillsController < ApplicationController
         if @bill.save
             render json: @bill.to_json()
         else
-            render json: { 
-                message: "could not create bill, please try again"
-            }.to_json() 
+            render json: { message: "could not create bill, please try again"}.to_json() 
             print @bill.errors.full_messages
         end
     end
@@ -33,35 +31,24 @@ class Api::BillsController < ApplicationController
 
     def update
         puts 'updating bill and recipients'
-        if params[:tax]
-            @bill.update!(tax: params[:tax])
-            update_bill_on_gratuity
-            update_recipient_on_gratuity
-        elsif params[:gratuity]
-            @bill.update!(gratuity: params[:gratuity])
-            update_bill_on_gratuity
-            update_recipient_on_gratuity
+        if params[:tax] || params[:gratuity]
+            @bill.update!(tax: params[:tax]) if params[:tax]
+            @bill.update!(gratuity: params[:gratuity]) if params[:gratuity]
         else
             @bill.update(bill_params)
         end
+        UpdateBillValues.new(@bill).call
+        update_recipient_on_gratuity
         render json: @bill.to_json(include: { bill_recipients: {include: :bill_items} })
     end
 
-    def update_bill_on_gratuity
-        new_gratuity = @bill.gratuity * @bill.subtotal
-        bill_total = @bill.subtotal + @bill.tax + new_gratuity
-        @bill.update!(total_amount: bill_total, gratuity_amount: new_gratuity)
-    end
 
     def update_recipient_on_gratuity
         @bill.bill_recipients.each do |recipient|
-            recipient_share_of_tax = recipient.subtotal / @bill.subtotal
-            recipient_tax = @bill.tax * recipient_share_of_tax
-            new_recipient_gratuity = @bill.gratuity * recipient.subtotal
-            new_recipient_owes = recipient.subtotal + recipient_tax + new_recipient_gratuity
-            recipient.update!(gratuity: new_recipient_gratuity, tax: recipient_tax, total_owes: new_recipient_owes)
+            UpdateBillRecipientValues.new(recipient).call
         end
     end
+    
 
     private
 
