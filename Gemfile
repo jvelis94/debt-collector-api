@@ -42,3 +42,4 @@ gem 'devise'
 gem 'devise-jwt'
 gem 'rack-cors'
 gem 'dotenv-rails', groups: [:development, :test]
+gem 'whenever', require: false
