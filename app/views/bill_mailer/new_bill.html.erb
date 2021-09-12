@@ -9,5 +9,12 @@
 
   <body>
     <h1><%= @bill.bill_name %></h1>
+
+    <p>Our records show that the following recipients still owe you payment:</p>
+    <ul>
+        <% @bill.bill_recipients.each do |recipient| %>
+            <li><%= recipient.recipient_name %> (owes <%= recipient.total_owes %>)</li>
+        <% end %>
+    </ul>
   </body>
 </html>
