@@ -43,3 +43,7 @@ gem 'devise-jwt'
 gem 'rack-cors'
 gem 'dotenv-rails', groups: [:development, :test]
 gem 'whenever', require: false
+gem 'sidekiq'
+gem 'sidekiq-failures', '~> 1.0'
+gem 'redis'
+gem "sidekiq-cron", "~> 1.1"

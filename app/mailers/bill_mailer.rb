@@ -1,10 +1,7 @@
 class BillMailer < ActionMailer::Base
     def new_bill
         puts "NEW BILL"
-        # @user = params[:user]
-        # @bill = params[:bill]
-        # puts @user.email
-        # puts @bill.bill_name
-        mail(to: "velisjoel@gmail.com", subject: 'New Bill Created')
+        @bill = params[:bill]
+        mail(to: @bill.user.email, subject: "Have you been paid for #{@bill.bill_name} charges?")
     end
 end
