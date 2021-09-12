@@ -12,9 +12,13 @@
 
     <p>Our records show that the following recipients still owe you payment:</p>
     <ul>
-        <% @bill.bill_recipients.each do |recipient| %>
+        <% @bill.bill_recipients.where(is_paid: false).each do |recipient| %>
             <li><%= recipient.recipient_name %> (owes <%= recipient.total_owes %>)</li>
         <% end %>
     </ul>
+
+    <p>If you have received payment, please update your recipients!</p>
+    <br>
+    <p><%= link_to 'Update Recipients', "https://debt-collector-nextjs.vercel.app"%></p>
   </body>
 </html>

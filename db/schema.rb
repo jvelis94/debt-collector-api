@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_05_175407) do
+ActiveRecord::Schema.define(version: 2021_09_12_192726) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 2021_09_05_175407) do
     t.float "subtotal", default: 0.0
     t.float "tax", default: 0.0
     t.float "gratuity", default: 0.0
+    t.boolean "is_paid", default: false
     t.index ["bill_id"], name: "index_bill_recipients_on_bill_id"
   end
 

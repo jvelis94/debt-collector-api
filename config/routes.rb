@@ -8,7 +8,11 @@ Rails.application.routes.draw do
           patch :decrement_quantity
         end
       end
-      resources :bill_recipients
+      resources :bill_recipients do
+        member do
+          patch :mark_is_paid
+        end
+      end
     end
 
   end

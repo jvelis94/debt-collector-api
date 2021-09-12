@@ -14,6 +14,12 @@ class Api::BillRecipientsController < ApplicationController
         end
     end
 
+    def mark_is_paid
+        bill = Bill.find(params[:bill_id])
+        BillRecipient.find(params[:id]).update!(is_paid: true)
+        render json: bill.to_json(include: { bill_recipients: {include: :bill_items} })
+    end
+
     private
 
     def bill_recipient_params
