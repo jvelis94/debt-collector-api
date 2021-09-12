@@ -14,6 +14,7 @@ class Api::BillsController < ApplicationController
         @bill = Bill.new(bill_params)
         @bill.user = current_user
         if @bill.save
+            BillMailer.with(bill: @bill, user: current_user).new_bill.deliver_later
             render json: @bill.to_json()
         else
             render json: { message: "could not create bill, please try again"}.to_json() 
