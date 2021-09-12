@@ -1,9 +1,33 @@
 class Users::SessionsController < Devise::SessionsController
     respond_to :json
+
+    # def new
+    #   super
+    
+    # end
+
+
+    # def create
+    #   # puts self.resource
+    #   # self.resource = warden.authenticate!(auth_options)
+    #   # sign_in(resource_name, resource)
+    #   puts "IN CREATEEEEE"
+    #   sign_in(resource_name, resource)
+    #   # yield resource if block_given?
+    #   respond_with resource, location: after_sign_in_path_for(resource)
+
+    # end
   
     private
+
+    # def auth_options
+    #   puts "in auth options"
+    #   # { scope: resource_name, recall: "#{controller_path}#new" }
+    # end
   
     def respond_with(resource, _opts = {})
+      puts "RESPONDING"
+      puts _opts
       render json: resource
     end
   
