@@ -121,11 +121,10 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address: "smtp.gmail.com",
     port: 587,
-    domain: "debt-collector-api-wts7v.ondigitalocean.app",
+    domain: "gmail.com",
     user_name: ENV["GMAIL"],
     password: ENV["GMAIL_PASSWORD"],
-    authentication: :plain,
+    authentication: "plain",
     enable_starttls_auto: true
   }
-  
 end
