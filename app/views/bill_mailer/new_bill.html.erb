@@ -13,7 +13,9 @@
     <p>Our records show that the following recipients still owe you payment:</p>
     <ul>
         <% @bill.bill_recipients.where(is_paid: false).each do |recipient| %>
-            <li><%= recipient.recipient_name %> (owes <%= recipient.total_owes %>)</li>
+            <li><%= recipient.recipient_name %> 
+            (owes <%= number_with_precision recipient.total_owes, precision: 2 %>)
+            </li>
         <% end %>
     </ul>
 
