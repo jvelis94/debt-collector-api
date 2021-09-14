@@ -2,6 +2,8 @@
 
 Split (debt-collector) is an application that allows users to Split bills with their friends.
 
+Frontend can be found [here](https://github.com/jvelis94/debt-collector-nextjs)
+
 ## Backend Technologies:
 
 * Ruby on Rails
