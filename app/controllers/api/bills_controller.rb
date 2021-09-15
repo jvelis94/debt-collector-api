@@ -1,5 +1,5 @@
 class Api::BillsController < ApplicationController
-    before_action :authenticate_user!
+    before_action :authenticate_user!, except: [:create, :update]
     before_action :set_bill, only: [:show, :update]
 
     respond_to :html, :json
@@ -12,9 +12,8 @@ class Api::BillsController < ApplicationController
     
     def create
         @bill = Bill.new(bill_params)
-        @bill.user = current_user
+        @bill.user = current_user if !@bill.user
         if @bill.save
-            BillMailer.with(bill: @bill).new_bill.deliver_later
             render json: @bill.to_json()
         else
             render json: { message: "could not create bill, please try again"}.to_json() 
@@ -44,21 +43,22 @@ class Api::BillsController < ApplicationController
     end
 
 
+    
+    
+    private
+    
     def update_recipient_on_gratuity
         @bill.bill_recipients.each do |recipient|
             UpdateBillRecipientValues.new(recipient).call
         end
     end
-    
-
-    private
 
     def set_bill
         @bill = Bill.includes(:bill_recipients).find(params[:id])
     end
 
     def bill_params
-        params.require(:bill).permit(:bill_name)
+        params.require(:bill).permit(:bill_name, :user_id)
     end
 
     # def update_tax(tax_param)

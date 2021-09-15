@@ -1,5 +1,5 @@
 class Api::BillRecipientsController < ApplicationController
-    before_action :authenticate_user!
+    # before_action :authenticate_user!
 
     def create
         @bill_recipient = BillRecipient.new(bill_recipient_params)
