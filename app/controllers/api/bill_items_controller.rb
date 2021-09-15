@@ -1,5 +1,5 @@
 class Api::BillItemsController < ApplicationController
-    before_action :authenticate_user!
+    # before_action :authenticate_user!
     before_action :set_bill_item, only: [:show, :increment_quantity, :decrement_quantity, :destroy]
     before_action :set_bill
     before_action :set_bill_recipient
